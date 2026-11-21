@@ -13,7 +13,9 @@ Images are data URLs. Send 512x512 images; masks are 512x512 PNGs, white = repla
 | POST | `/api/jobs` | `{ name, email, region, detection, option, estimate, before, after }` | `{ job: { id, status } }` ($49 demo payment) |
 | GET | `/api/jobs` | – | `{ jobs: Job[], stats: { total, contracts, fees, avgDeltaPct } }` |
 | GET | `/api/jobs/:id` | – | `{ job }` |
-| POST | `/api/jobs/:id/contract` | `{ company, price, note }` | `{ job }` |
+| POST | `/api/jobs/:id/contract` | `{ company, price, note }` | `{ job }` (also adds a calibration sample) |
+| POST | `/api/jobs/:id/accept` | `{}` | `{ job }` (homeowner accepts; feeds conversion data) |
+| GET | `/api/insights` | – | `{ totals, calibration[], options[], minSamples }` (anonymous learning data) |
 
 Types are defined in `frontend/src/lib/snapquote-api.ts`.
 
@@ -37,4 +39,11 @@ Types are defined in `frontend/src/lib/snapquote-api.ts`.
 
 ## How pricing works
 
-`price = (material + labour per unit) × quantity × region × condition × structural`, rounded to $50. The price book and region multipliers sit at the top of `backend/src/index.js` and are demo values. The LLM writes the feasibility text but never sets the price; a structural flag caps the score at 6/10.
+`price = (material + labour per unit) × quantity × region × condition × structural`, rounded to $50. The price book and region multipliers sit in `backend/src/config.js` and are demo values. The LLM writes the feasibility text but never sets the price; a structural flag caps the score at 6/10.
+
+## Data moat (anonymous learning)
+
+Every submitted plan writes an anonymous record to KV (`data:<id>`): item type, region, condition, quantity, chosen option, estimate range, contract price, accepted. No name, email or photos.
+
+- **Estimate-to-contract calibration.** Each signed contract adds a sample `contract price ÷ uncorrected estimate midpoint` to `calib:<item_type>|<region>`. Once an area has 3 samples, new estimates there are multiplied by the average ratio (clamped 0.7–1.4), shown as `multipliers.learned` and `calibration` in the estimate.
+- **Visual-to-conversion.** `/api/insights` groups records by item type and visualized option and reports how many became accepted jobs.

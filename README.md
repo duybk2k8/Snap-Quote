@@ -8,7 +8,18 @@ Snap a photo, see the replacement, get it quoted! SnapQuote turns your photo int
 ```
 SnapQuote/
 ├── backend/                 Cloudflare Worker (JSON API + AI pipeline)
-│   ├── src/index.js
+│   ├── src/
+│   │   ├── index.js         Router: path → feature handler
+│   │   ├── config.js        Models, price book, regions
+│   │   ├── features/
+│   │   │   ├── analyze.js   Stage 1: vision analysis
+│   │   │   ├── visualize.js Stage 2: inpainting / img2img preview
+│   │   │   ├── estimate.js  Stage 3: price book + feasibility summary
+│   │   │   ├── jobs.js      $49 submit, contracts, acceptance
+│   │   │   └── insights.js  Data moat: calibration + conversion
+│   │   └── lib/
+│   │       ├── storage.js   KV with in-memory fallback
+│   │       └── utils.js     JSON/CORS, parsing, base64
 │   ├── wrangler.toml        AI binding, KV binding, CORS origin
 │   └── package.json
 ├── frontend/                What goes into Lovable
@@ -60,5 +71,5 @@ npm run dev     # wrangler dev --remote (Workers AI runs on Cloudflare)
 ## Notes
 
 - The $49 payment is a demo. Swap in Stripe Checkout for production.
-- Prices come from a demo price book in `backend/src/index.js`; replace with real regional data.
+- Prices come from a demo price book in `backend/src/config.js`; replace with real regional data.
 - First vision call accepts the Llama 3.2 license automatically.

@@ -32,7 +32,9 @@ export interface Price {
   labour: [number, number];
   unit: string;
   quantity: number;
-  multipliers: { region: number; condition: number; structural: number };
+  multipliers: { region: number; condition: number; structural: number; learned: number };
+  /** Data moat: correction learned from past signed contracts in this item type + region. */
+  calibration: { applied: boolean; samples: number; factor: number; needed: number };
 }
 
 export interface Estimate {
@@ -65,8 +67,9 @@ export interface Job {
   before: string; // data URL
   after: string | null; // data URL
   payment: { amount: number; status: string };
-  status: "awaiting_contract" | "contract_sent";
+  status: "awaiting_contract" | "contract_sent" | "accepted";
   contract: Contract | null;
+  acceptedAt?: string;
 }
 
 export interface JobStats {
@@ -74,6 +77,15 @@ export interface JobStats {
   contracts: number;
   fees: number;
   avgDeltaPct: number | null;
+}
+
+export interface Insights {
+  totals: { plans: number; contracts: number; accepted: number; conversionPct: number };
+  /** Estimate-to-contract calibration per item type + region. */
+  calibration: { item_type: string; region: string; samples: number; factor: number; active: boolean }[];
+  /** Visual-to-conversion: which visualized replacements become accepted jobs. */
+  options: { option: string; item_type: string; plans: number; contracts: number; accepted: number; acceptRate: number }[];
+  minSamples: number;
 }
 
 async function request<T>(path: string, body?: unknown): Promise<T> {
@@ -116,4 +128,10 @@ export const api = {
 
   sendContract: (id: string, company: string, price: number, note: string) =>
     request<{ job: Job }>(`/api/jobs/${id}/contract`, { company, price, note }),
+
+  /** Homeowner accepts the contract (feeds visual-to-conversion data). */
+  acceptContract: (id: string) => request<{ job: Job }>(`/api/jobs/${id}/accept`, {}),
+
+  /** Anonymous learning data: calibration + conversion by visualized option. */
+  insights: () => request<Insights>("/api/insights"),
 };
