@@ -12,7 +12,7 @@ Build **SnapQuote**, a web app where homeowners snap a photo of something to rep
 
 ## Routes
 
-1. `/` Landing: headline "Snap it. See it. Get it quoted.", one-line subhead, a 3-step strip (Snap → Preview & price → Get contracts), CTA buttons "Get a quote" (→ `/quote`) and "I'm a contractor" (→ `/contractor`).
+1. `/` Landing: headline "Snap it. See it. Get it quoted!", one-line subhead, a 3-step strip (Snap → Preview & price → Get contracts), CTA buttons "Get a quote" (→ `/quote`) and "I'm a contractor" (→ `/contractor`).
 
 2. `/quote` Homeowner flow as a 4-step wizard with a progress bar:
    - **Step 1 – Upload.** File input + camera capture on mobile, region select (options from `api.config().regions`). Convert the file with `fileToSquareJpeg(file)` and show it in a 512x512 square. On top, a transparent `<canvas width=512 height=512>` at 45% opacity hooked to `createMaskPainter(canvas, () => brushSize)`. Show a brush-size slider and "Clear paint" button, with the hint "Optional: paint over the part to replace for a precise preview." Button **Analyze photo** → `api.analyze(image)`.

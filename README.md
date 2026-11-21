@@ -2,7 +2,7 @@
 
 Snap a photo, see the replacement, get it quoted! SnapQuote turns your photo into a priced, visualized, contractor-ready repair plan. Built for CaseHacks Hackday 2026.
 
-- **Front end:** Lovable (React + Tailwind), in its own Lovable project
+- **Front end:** Lovable (React + Tailwind), built in Lovable ([Lovable Dashboard](https://lovable.dev/dashboard))
 - **Back end:** Cloudflare Worker + Workers AI + KV, in `backend/`
 
 ```
