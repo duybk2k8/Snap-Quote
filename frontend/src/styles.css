@@ -1,0 +1,206 @@
+/*
+ * Tailwind v4 entry: config lives here, with no tailwind.config.js or PostCSS plugin.
+ * - Keep every @import in this top block, above @theme and the rest of the file. Install an
+ *   npm package before @importing its CSS. Never @import a remote URL (web fonts, CDN CSS): the
+ *   build resolves @import from the filesystem. Load those with a <link> in the head() of
+ *   src/routes/__root.tsx and name the family in a --font-* token in @theme inline below.
+ */
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The design lives in this file: oklch color tokens on the shadcn variables
+ * (--background, --foreground, --primary, --secondary, --muted, --accent, ...) plus
+ * new tokens as needed, font tokens, and custom styles and animations.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-header: var(--header);
+  --color-header-foreground: var(--header-foreground);
+  --color-page-muted: var(--page-muted);
+  --color-page-border: var(--page-border);
+  --color-page-raised: var(--page-raised);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-rust: var(--rust);
+  --color-rust-foreground: var(--rust-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger-soft: var(--danger-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --shadow-card: var(--shadow-card);
+  --shadow-cta: var(--shadow-cta);
+}
+
+/*
+ * SnapQuote palette: charcoal header (#16181d), concrete-textured grey page, white cards,
+ * safety orange (#ea580c) primary, rust (#c2410c) accents, light orange (#ffedd5) highlight.
+ */
+:root {
+  --radius: 0.75rem;
+  --background: oklch(0.4 0.006 75);
+  --foreground: oklch(0.985 0.003 75);
+  --header: oklch(0.205 0.008 264);
+  --header-foreground: oklch(0.98 0.003 264);
+  --page-muted: oklch(0.88 0.006 75);
+  --page-border: oklch(0.5 0.006 75);
+  --page-raised: oklch(0.35 0.006 75);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.012 264);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.012 264);
+  --primary: oklch(0.646 0.194 41.1);
+  --primary-foreground: oklch(1 0 0);
+  --rust: oklch(0.553 0.177 38.4);
+  --rust-foreground: oklch(1 0 0);
+  --highlight: oklch(0.954 0.038 75.2);
+  --highlight-foreground: oklch(0.47 0.14 38);
+  --success: oklch(0.56 0.14 152);
+  --success-soft: oklch(0.95 0.05 152);
+  --warning: oklch(0.62 0.15 65);
+  --warning-soft: oklch(0.96 0.06 90);
+  --danger-soft: oklch(0.95 0.035 25);
+  --secondary: oklch(0.965 0.003 264);
+  --secondary-foreground: oklch(0.25 0.012 264);
+  --muted: oklch(0.965 0.003 264);
+  --muted-foreground: oklch(0.5 0.014 264);
+  --accent: oklch(0.954 0.038 75.2);
+  --accent-foreground: oklch(0.47 0.14 38);
+  --destructive: oklch(0.577 0.215 27.3);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.915 0.005 264);
+  --input: oklch(0.87 0.007 264);
+  --ring: oklch(0.646 0.194 41.1);
+  --chart-1: oklch(0.646 0.194 41.1);
+  --chart-2: oklch(0.553 0.177 38.4);
+  --chart-3: oklch(0.56 0.14 152);
+  --chart-4: oklch(0.62 0.15 65);
+  --chart-5: oklch(0.5 0.014 264);
+  --sidebar: oklch(0.205 0.008 264);
+  --sidebar-foreground: oklch(0.98 0.003 264);
+  --sidebar-primary: oklch(0.646 0.194 41.1);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.285 0.015 264);
+  --sidebar-accent-foreground: oklch(0.98 0.003 264);
+  --sidebar-border: oklch(0.34 0.014 264);
+  --sidebar-ring: oklch(0.646 0.194 41.1);
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.12), 0 12px 32px -12px oklch(0 0 0 / 0.45);
+  --shadow-cta: 0 10px 28px -10px color-mix(in oklab, var(--primary) 70%, transparent);
+  --hazard-stripe: repeating-linear-gradient(
+    -45deg,
+    var(--primary) 0 10px,
+    var(--header) 10px 20px
+  );
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@utility font-numeric {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+@utility hazard-stripe {
+  background: var(--hazard-stripe);
+}
+
+@utility checker-bg {
+  background-color: var(--muted);
+  background-image:
+    linear-gradient(45deg, var(--border) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--border) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--border) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--border) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+
+/* Poured-concrete page texture: fine grain + soft mottling over the concrete base color. */
+@utility concrete-bg {
+  background-color: var(--background);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.55'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)' opacity='0.7'/%3E%3C/svg%3E");
+  background-blend-mode: soft-light, soft-light;
+  background-attachment: fixed;
+}

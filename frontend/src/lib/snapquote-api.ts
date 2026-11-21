@@ -208,6 +208,17 @@ export const api = {
   /** Homeowner accepts and pays repair price + quote fee (demo payment). */
   payContract: (id: string) => request<{ job: Job }>(`/api/jobs/${id}/pay`, {}),
 
+  // ---- Names used by the homeowner wizard ----
+  /** Send the plan to contractors (demo: no card is charged). */
+  submitJob: (payload: {
+    company?: string; name: string; email: string; region: string;
+    detection: Detection; option: ReplacementOption; estimate: Estimate;
+    before: string; after: string | null;
+  }) => request<{ job: { id: string; status: JobStatus; quoteFee: QuoteFee } }>("/api/jobs", payload),
+
+  /** Homeowner accepts the contract (server alias of /pay). */
+  acceptContract: (id: string) => request<{ job: Job }>(`/api/jobs/${id}/accept`, {}),
+
   // ---- Learning data ----
   insights: () => request<Insights>("/api/insights"),
 };
