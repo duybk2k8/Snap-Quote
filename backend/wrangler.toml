@@ -2,7 +2,7 @@
 # Deploy: cd backend && npm install && npx wrangler deploy
 name = "odd-lab-d694"
 main = "src/index.js"
-compatibility_date = "2026-11-01"
+compatibility_date = "2025-09-01"
 
 # Workers AI binding (vision, inpainting, text models)
 [ai]

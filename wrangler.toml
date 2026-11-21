@@ -1,0 +1,15 @@
+# Root-level config so Cloudflare Workers Builds works even when the
+# build's root directory is the repo root. Mirrors backend/wrangler.toml.
+name = "odd-lab-d694"
+main = "backend/src/index.js"
+compatibility_date = "2025-09-01"
+
+[ai]
+binding = "AI"
+
+[vars]
+ALLOWED_ORIGIN = "*"
+
+# [[kv_namespaces]]
+# binding = "JOBS"
+# id = "PASTE_KV_NAMESPACE_ID_HERE"
