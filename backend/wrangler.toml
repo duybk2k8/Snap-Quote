@@ -1,0 +1,20 @@
+# Cloudflare Worker config for the SnapQuote API.
+# Deploy: cd backend && npm install && npx wrangler deploy
+name = "odd-lab-d694"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+# Workers AI binding (vision, inpainting, text models)
+[ai]
+binding = "AI"
+
+# Lock this to your Lovable URL once it is published, e.g. "https://snapquote.lovable.app"
+[vars]
+ALLOWED_ORIGIN = "*"
+
+# Job storage. Create it once with:
+#   npx wrangler kv namespace create JOBS
+# then paste the id it prints below and uncomment these lines.
+# [[kv_namespaces]]
+# binding = "JOBS"
+# id = "PASTE_KV_NAMESPACE_ID_HERE"
