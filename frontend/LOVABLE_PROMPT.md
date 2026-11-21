@@ -8,7 +8,7 @@ Build **SnapQuote**, a web app where homeowners snap a photo of something to rep
 
 **Tech:** React + TypeScript + Tailwind + shadcn/ui. No Supabase and no auth: all data comes from an external REST API on Cloudflare Workers. Put the API client in `src/lib/snapquote-api.ts` and image helpers in `src/lib/image-tools.ts` (I will give you their code). Read the base URL from `import.meta.env.VITE_API_BASE_URL`.
 
-**Style:** clean, confident, trustworthy. Dark charcoal header (#16181d), off-white background (#f6f5f2), white cards with soft borders, one blue accent (#1f6feb). Large readable numbers for score and price. Mobile-first.
+**Style:** clean, confident, trustworthy. Dark charcoal header (#16181d), dark charcoal/slate grey, and white cards with soft borders. Large readable numbers for score and price. Mobile-first. Use construction safety orange (#ea580c) for primary buttons and active steps, warm rust-orange (#c2410c) for secondary accents and price highlights, and soft orange tint (#fff7ed) for selected cards and tags.
 
 ## Routes
 
@@ -19,20 +19,6 @@ Build **SnapQuote**, a web app where homeowners snap a photo of something to rep
    - **Step 2 – What the AI sees.** Show `item_label`, material, condition badge (good = green, fair = amber, poor = red), quantity, approx dimensions, `visible_issues` as chips, and a red "Possible structural work" chip if `structural_concern`. Show the 3 `replacement_options` as selectable cards (name + prompt as caption) plus a "Something else" card with a text input. Button **Visualize & estimate** calls `api.visualize(image, option.prompt, painter.getMask())` and `api.estimate(detection, option, region)` in parallel with `Promise.all`. Show a skeleton loader with the text "Rendering your preview… (10–20s)".
    - **Step 3 – Preview & estimate.** Left: a before/after comparison slider (before = original, after = returned image; draggable divider). Under it, a note: inpaint mode → "Replaced only the area you painted", img2img → "Whole-photo restyle. Paint the area for a precise swap." Right: a big feasibility score `/10` colored by value (≥8 green, ≥5 amber, else red) with `feasibility_label` and `rationale`; the price range `$low – $high` with "quantity × unit · region"; a small table (Materials low/high, Labour low/high) and a muted line listing the multipliers; a "Local accuracy" badge from `price.calibration`: if `applied`, show "Adjusted from {samples} signed contracts in your area (×{factor})", otherwise "Learning: {samples}/{needed} local contracts"; two lists, Scope and Materials; "Typical timeline: N days"; "Contractor will confirm: …" from `verify_on_site`.
    - **Step 4 – Get contracts.** Name and email inputs, button **Pay $49 & send to contractors** → `api.submitJob({...})`. Label it clearly "Demo mode: no card is charged." On success, show a success card with the plan ID and a **Check for contract** button that calls `api.getJob(id)` and shows either "No contract yet, contractors are reviewing your plan" or the company, contract price and note, with an "Accept contract" button that calls `api.acceptContract(id)` and then shows a confirmation toast and an "Accepted" badge.
-
-3. `/contractor` Contractor dashboard:
-   - Top row of 4 stat cards from `api.listJobs().stats`: Verified jobs (`total`), Contracts sent (`contracts`), Verification fees (`$fees`), Estimate vs contract (`avgDeltaPct` with + sign, or "–").
-   - A Refresh button; poll every 10 seconds.
-   - A list of job cards, newest first: before/after thumbnails, `#id · item_label → option.name`, region badge, customer name, "paid $49", date, feasibility `x/10`, estimate range, timeline, rationale, scope bullets.
-   - If no contract: inline form with company name, price (prefilled with the estimate midpoint), note, and **Send contract** → `api.sendContract(id, company, price, note)`, then refresh. If a contract exists: a green box "Contract sent by {company} for ${price}".
-   - Empty state: "No jobs yet. Submit one from the homeowner flow."
-   - Status badges: awaiting_contract = grey "Awaiting contract", contract_sent = blue "Contract sent", accepted = green "Accepted by homeowner".
-
-4. `/insights` Market insights (link it from the contractor dashboard header). This is the product's data moat, built from anonymous records only (no names, emails or photos). Data from `api.insights()`, refresh every 15 seconds:
-   - 4 stat cards from `totals`: Plans submitted, Contracts sent, Accepted, Conversion %.
-   - "Estimate accuracy by area": a table of `calibration` rows (item type, region, signed contracts, correction factor shown as +x% or −x%, and an "Active" badge when `active`, otherwise "Learning (samples/minSamples)"). Caption: "Each signed contract teaches SnapQuote the real local price. After {minSamples} contracts, new estimates in that area are adjusted automatically."
-   - "What converts": a horizontal bar chart (recharts) of `options` by `acceptRate`, labelled "{item_type} · {option}", with plans and accepted counts in the tooltip. Caption: "Which visualized replacements homeowners actually buy."
-   - Empty state: "No data yet. Every submitted plan and signed contract adds to it."
 
 ## Behaviour
 
