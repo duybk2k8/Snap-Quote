@@ -3,7 +3,7 @@
 import { TEXT_MODEL, PRICE_BOOK, REGIONS, CONDITION, CALIB_MIN_SAMPLES } from '../config.js';
 import { json, readJSON, arr, clampInt, round50 } from '../lib/utils.js';
 import { normalizeDetection } from './analyze.js';
-import { getCalibration } from './insights.js';
+import { getCalibration, getLocalContext } from './insights.js';
 
 export async function estimate(request, env) {
   const { detection, option, region } = await request.json();
@@ -11,6 +11,11 @@ export async function estimate(request, env) {
   const det = normalizeDetection(detection);
   const calib = await getCalibration(env, det.item_type, region);
   const price = priceJob(det, region, calib);
+  const local = await getLocalContext(env, det.item_type, region);
+  const localLine = local.completedJobs
+    ? 'Local data from ' + local.completedJobs + ' paid jobs for this item in ' + region + ': average paid price $' +
+      local.avgPaidPrice + '; most chosen options: ' + local.popularOptions.map((o) => o.name + ' (' + o.count + ')').join(', ') + '.\n'
+    : '';
 
   const prompt =
     'You are a licensed renovation contractor writing a pre-inspection feasibility summary.\n' +
@@ -18,6 +23,7 @@ export async function estimate(request, env) {
     'Chosen replacement: ' + JSON.stringify(option) + '\n' +
     'Region: ' + (region || 'unknown') + '\n' +
     'Price range already computed from our price book: $' + price.low + ' - $' + price.high + ' for ' + price.quantity + ' ' + price.unit + '(s).\n' +
+    localLine +
     'Return ONLY JSON with keys:\n' +
     '{"feasibility_score": integer 1-10 (10 = simple like-for-like swap, low = structural work needed),\n' +
     ' "feasibility_label": short phrase,\n' +
@@ -49,6 +55,7 @@ export async function estimate(request, env) {
       timeline_days: clampInt(ai.timeline_days, 1, 90),
       verify_on_site: arr(ai.verify_on_site),
       price,
+      local,
       region: region || null,
     },
   });

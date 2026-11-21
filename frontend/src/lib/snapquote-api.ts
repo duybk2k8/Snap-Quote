@@ -11,6 +11,8 @@ export type ItemType =
 export interface ReplacementOption {
   name: string;
   prompt: string;
+  /** Set when paid jobs in this area chose this option (count of paid jobs). */
+  localFavorite?: number;
 }
 
 export interface Detection {
@@ -25,6 +27,13 @@ export interface Detection {
   replacement_options: ReplacementOption[];
 }
 
+/** What paid jobs in this area tell us (learning data). */
+export interface LocalContext {
+  completedJobs: number;
+  popularOptions: { name: string; count: number }[];
+  avgPaidPrice: number | null;
+}
+
 export interface Price {
   low: number;
   high: number;
@@ -33,7 +42,7 @@ export interface Price {
   unit: string;
   quantity: number;
   multipliers: { region: number; condition: number; structural: number; learned: number };
-  /** Data moat: correction learned from past signed contracts in this item type + region. */
+  /** Correction learned from paid jobs in this item type + region. */
   calibration: { applied: boolean; samples: number; factor: number; needed: number };
 }
 
@@ -46,19 +55,55 @@ export interface Estimate {
   timeline_days: number;
   verify_on_site: string[];
   price: Price;
+  local: LocalContext;
   region: string | null;
+}
+
+export interface QuoteFee {
+  fee: number;          // what the homeowner pays now
+  base: number;         // $25
+  discountPct: number;  // loyalty discount applied
+  completedJobs: number;
+  nextFee: number;      // fee after one more completed repair
+  floor: number;
+}
+
+export interface Company {
+  slug: string;
+  name: string;
+  city: string;
+  trades: string[];
+  plan: { monthlyFee: number; status: string };
+  createdAt: string;
 }
 
 export interface Contract {
   company: string;
-  price: number;
+  repairPrice: number;
+  quoteFee: number;
+  discountPct: number;
+  total: number;
   note: string;
   sentAt: string;
 }
 
+export interface Billing {
+  repairPrice: number;
+  quoteFee: number;
+  total: number;
+  platformCommission: number;
+  companyPayout: number;
+  commissionPct: number;
+  method: string;
+  paidAt: string;
+}
+
+export type JobStatus = "requested" | "contract_sent" | "paid";
+
 export interface Job {
   id: string;
   createdAt: string;
+  company: { slug: string; name: string } | null;
   customer: { name: string; email: string };
   region: string | null;
   detection: Detection;
@@ -66,26 +111,43 @@ export interface Job {
   estimate: Estimate;
   before: string; // data URL
   after: string | null; // data URL
-  payment: { amount: number; status: string };
-  status: "awaiting_contract" | "contract_sent" | "accepted";
+  quoteFeePreview: QuoteFee;
+  status: JobStatus;
   contract: Contract | null;
-  acceptedAt?: string;
+  billing: Billing | null;
+  nextQuoteFee?: QuoteFee;
 }
 
 export interface JobStats {
-  total: number;
+  requests: number;
   contracts: number;
-  fees: number;
+  paid: number;
+  repairRevenue: number;
+  quoteFees: number;
+  platformCommission: number;
+  companyPayout: number;
   avgDeltaPct: number | null;
 }
 
 export interface Insights {
-  totals: { plans: number; contracts: number; accepted: number; conversionPct: number };
-  /** Estimate-to-contract calibration per item type + region. */
+  totals: { requests: number; contracts: number; paid: number; conversionPct: number; learningRecords: number };
   calibration: { item_type: string; region: string; samples: number; factor: number; active: boolean }[];
-  /** Visual-to-conversion: which visualized replacements become accepted jobs. */
-  options: { option: string; item_type: string; plans: number; contracts: number; accepted: number; acceptRate: number }[];
+  /** What homeowners actually bought, from paid jobs only. */
+  options: { option: string; item_type: string; completed: number; avgPaidPrice: number }[];
   minSamples: number;
+}
+
+export interface Config {
+  regions: string[];
+  storage: "kv" | "memory";
+  ai: boolean;
+  pricing: {
+    quoteFee: number;
+    loyaltyDiscountPct: number;
+    quoteFeeFloor: number;
+    platformCommissionPct: number;
+    companyPlanFee: number;
+  };
 }
 
 async function request<T>(path: string, body?: unknown): Promise<T> {
@@ -100,38 +162,52 @@ async function request<T>(path: string, body?: unknown): Promise<T> {
 }
 
 export const api = {
-  config: () =>
-    request<{ regions: string[]; storage: "kv" | "memory"; ai: boolean }>("/api/config"),
+  config: () => request<Config>("/api/config"),
 
-  /** Stage 1: Llama 3.2 Vision reads the photo. `image` = 512x512 JPEG data URL. */
-  analyze: (image: string) =>
-    request<{ detection: Detection }>("/api/analyze", { image }),
+  // ---- Free quoting ----
+  /** Stage 1: vision analysis. `image` = 512x512 JPEG data URL. Pass region to get local favorites. */
+  analyze: (image: string, region?: string) =>
+    request<{ detection: Detection; local: LocalContext | null }>("/api/analyze", { image, region }),
 
   /** Stage 2: Stable Diffusion inpainting (with mask) or img2img (without). */
   visualize: (image: string, prompt: string, mask?: string | null) =>
     request<{ image: string; mode: "inpaint" | "img2img" }>("/api/visualize", { image, prompt, mask: mask ?? null }),
 
-  /** Stage 3: price book + Llama 3.3 feasibility summary. */
+  /** Stage 3: price book (+ learned correction) and feasibility summary. */
   estimate: (detection: Detection, option: ReplacementOption, region: string) =>
     request<{ estimate: Estimate }>("/api/estimate", { detection, option, region }),
 
-  /** $49 verification (demo payment) – sends the plan to contractors. */
-  submitJob: (payload: {
-    name: string; email: string; region: string;
+  /** Quote fee this homeowner would pay right now (loyalty discount applied). */
+  quoteFee: (email: string) =>
+    request<{ quoteFee: QuoteFee }>(`/api/quote-fee?email=${encodeURIComponent(email)}`),
+
+  // ---- Companies ----
+  createCompany: (name: string, city = "", email = "", trades: string[] = []) =>
+    request<{ company: Company }>("/api/companies", { name, city, email, trades }),
+  listCompanies: () => request<{ companies: Company[] }>("/api/companies"),
+  getCompany: (slug: string) => request<{ company: Company }>(`/api/companies/${slug}`),
+
+  // ---- Requests, contracts, payment ----
+  /** Free request to a company. No payment at this step. */
+  sendRequest: (payload: {
+    company?: string; name: string; email: string; region: string;
     detection: Detection; option: ReplacementOption; estimate: Estimate;
     before: string; after: string | null;
-  }) => request<{ job: { id: string; status: Job["status"] } }>("/api/jobs", payload),
+  }) => request<{ job: { id: string; status: JobStatus; quoteFee: QuoteFee } }>("/api/jobs", payload),
 
   getJob: (id: string) => request<{ job: Job }>(`/api/jobs/${id}`),
 
-  listJobs: () => request<{ jobs: Job[]; stats: JobStats }>("/api/jobs"),
+  /** Company dashboard. Pass a company slug to see only that company's jobs. */
+  listJobs: (company?: string) =>
+    request<{ jobs: Job[]; stats: JobStats }>(company ? `/api/jobs?company=${company}` : "/api/jobs"),
 
-  sendContract: (id: string, company: string, price: number, note: string) =>
-    request<{ job: Job }>(`/api/jobs/${id}/contract`, { company, price, note }),
+  /** Company finalizes the contract with the repair price; quote fee is added automatically. */
+  finalizeContract: (id: string, repairPrice: number, note = "") =>
+    request<{ job: Job }>(`/api/jobs/${id}/contract`, { repairPrice, note }),
 
-  /** Homeowner accepts the contract (feeds visual-to-conversion data). */
-  acceptContract: (id: string) => request<{ job: Job }>(`/api/jobs/${id}/accept`, {}),
+  /** Homeowner accepts and pays repair price + quote fee (demo payment). */
+  payContract: (id: string) => request<{ job: Job }>(`/api/jobs/${id}/pay`, {}),
 
-  /** Anonymous learning data: calibration + conversion by visualized option. */
+  // ---- Learning data ----
   insights: () => request<Insights>("/api/insights"),
 };

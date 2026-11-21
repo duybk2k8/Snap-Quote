@@ -30,3 +30,14 @@ export const ITEM_TYPES = Object.keys(PRICE_BOOK);
 
 // Signed contracts needed before a learned local price correction is applied.
 export const CALIB_MIN_SAMPLES = 3;
+
+// ---------------- Business model ----------------
+// Homeowners quote for free. When a company finalizes a contract, the homeowner pays
+// the repair price + the quote fee. Each completed repair lowers that homeowner's next
+// quote fee by 10% (compounding) down to a floor. SnapQuote keeps a commission on the
+// quote fee; the rest goes to the company. Companies also pay a fixed monthly plan fee.
+export const QUOTE_FEE = 25;
+export const LOYALTY_DISCOUNT = 0.1;
+export const QUOTE_FEE_FLOOR = 12.5;
+export const PLATFORM_COMMISSION = 0.2;
+export const COMPANY_PLAN_FEE = 1200;

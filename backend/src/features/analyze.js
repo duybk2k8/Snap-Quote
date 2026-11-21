@@ -2,9 +2,10 @@
 
 import { VISION_MODEL, ITEM_TYPES } from '../config.js';
 import { json, readJSON, clampInt, b64ToBytes } from '../lib/utils.js';
+import { getLocalContext } from './insights.js';
 
 export async function analyze(request, env) {
-  const { image } = await request.json();
+  const { image, region } = await request.json();
   if (!image) return json({ error: 'Missing image' }, 400);
   const bytes = b64ToBytes(image);
 
@@ -22,7 +23,21 @@ export async function analyze(request, env) {
 
   const res = await runVision(env, bytes, prompt);
   const detection = normalizeDetection(readJSON(res));
-  return json({ detection });
+
+  // Learned from paid jobs in this area: surface what local homeowners actually bought.
+  const local = region ? await getLocalContext(env, detection.item_type, region) : null;
+  if (local && local.popularOptions.length) {
+    const top = local.popularOptions[0];
+    const lower = (s) => String(s).toLowerCase();
+    const match = detection.replacement_options.find((o) => lower(o.name) === lower(top.name));
+    if (match) match.localFavorite = top.count;
+    else
+      detection.replacement_options = [
+        { name: top.name, prompt: 'a new ' + top.name + ', installed in place', localFavorite: top.count },
+        ...detection.replacement_options,
+      ].slice(0, 4);
+  }
+  return json({ detection, local });
 }
 
 async function runVision(env, bytes, prompt) {

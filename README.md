@@ -2,6 +2,8 @@
 
 Snap a photo, see the replacement, get it quoted! SnapQuote turns your photo into a priced, visualized, contractor-ready repair plan. Built for CaseHacks Hackday 2026.
 
+Home-service companies send their customers to SnapQuote instead of sending an inspector to the house. Homeowners quote for free, as often as they like, then send a free request. When the company finalizes the contract, the homeowner pays the repair price plus a $25 quote fee, which drops 10% after every completed repair.
+
 - **Front end:** Lovable (React + Tailwind), built in Lovable ([Lovable Dashboard](https://lovable.dev/dashboard))
 - **Back end:** Cloudflare Worker + Workers AI + KV, in `backend/`
 
@@ -10,13 +12,15 @@ SnapQuote/
 ├── backend/                 Cloudflare Worker (JSON API + AI pipeline)
 │   ├── src/
 │   │   ├── index.js         Router: path → feature handler
-│   │   ├── config.js        Models, price book, regions
+│   │   ├── config.js        Models, price book, regions, pricing rules
 │   │   ├── features/
 │   │   │   ├── analyze.js   Stage 1: vision analysis
 │   │   │   ├── visualize.js Stage 2: inpainting / img2img preview
 │   │   │   ├── estimate.js  Stage 3: price book + feasibility summary
-│   │   │   ├── jobs.js      $49 submit, contracts, acceptance
-│   │   │   └── insights.js  Data moat: calibration + conversion
+│   │   │   ├── jobs.js      Free requests, contract finalize, payment
+│   │   │   ├── billing.js   $25 quote fee, loyalty discount, commission split
+│   │   │   ├── companies.js Company signup and public links
+│   │   │   └── insights.js  Data moat: learns from paid jobs only
 │   │   └── lib/
 │   │       ├── storage.js   KV with in-memory fallback
 │   │       └── utils.js     JSON/CORS, parsing, base64
@@ -37,6 +41,22 @@ SnapQuote/
 | 1. Vision analysis | `@cf/meta/llama-3.2-11b-vision-instruct` | Item, material, condition, quantity, structural risk, 3 replacement options (JSON) |
 | 2. Visualization | `@cf/runwayml/stable-diffusion-v1-5-inpainting` (img2img fallback) | Before/after preview |
 | 3. Feasibility + price | Price book + `@cf/meta/llama-3.3-70b-instruct-fp8-fast` | Score /10, price range, scope, materials, timeline |
+
+## Business model
+
+| Who | Pays | When |
+| --- | --- | --- |
+| Homeowner | Nothing | Quoting and sending requests are free |
+| Homeowner | Repair price + $25 quote fee | Only after the company finalizes the contract |
+| Homeowner (returning) | Quote fee −10% per completed repair, compounding, floor $12.50 | Next contract |
+| Company | $1,200/month plan | Fixed, to use SnapQuote with its customers |
+| SnapQuote keeps | 20% of each quote fee + the monthly plans | On every paid job |
+
+All values live in `backend/src/config.js`.
+
+## Data moat
+
+Only jobs that were requested **and** finalized (paid) become learning data, stored anonymously (no names, emails or photos). Future quotes use it to correct local prices after 3 paid jobs in an area and to surface what nearby homeowners actually bought. Details in `docs/API.md`.
 
 ## 1. Deploy the back end
 
@@ -70,6 +90,6 @@ npm run dev     # wrangler dev --remote (Workers AI runs on Cloudflare)
 
 ## Notes
 
-- The $49 payment is a demo. Swap in Stripe Checkout for production.
+- Payments are a demo. In production use Stripe Connect: money goes to the company, SnapQuote's commission is the application fee.
 - Prices come from a demo price book in `backend/src/config.js`; replace with real regional data.
 - First vision call accepts the Llama 3.2 license automatically.
