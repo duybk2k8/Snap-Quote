@@ -15,6 +15,6 @@ ALLOWED_ORIGIN = "*"
 # Job storage. Create it once with:
 #   npx wrangler kv namespace create JOBS
 # then paste the id it prints below and uncomment these lines.
-# [[kv_namespaces]]
-# binding = "JOBS"
-# id = "PASTE_KV_NAMESPACE_ID_HERE"
+[[kv_namespaces]]
+binding = "JOBS"
+id = "882bbeca5c544a1aa7a30c4f50d51993"
