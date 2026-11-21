@@ -1,12 +1,12 @@
 # SnapQuote
 
-Snap a photo, see the replacement, get it quoted. SnapQuote turns a phone photo into a priced, visualized, contractor-ready repair plan. Built for CaseHacks Hackday 2026.
+Snap a photo, see the replacement, get it quoted! SnapQuote turns your photo into a priced, visualized, contractor-ready repair plan. Built for CaseHacks Hackday 2026.
 
 - **Front end:** Lovable (React + Tailwind), in its own Lovable project
 - **Back end:** Cloudflare Worker + Workers AI + KV, in `backend/`
 
 ```
-Snap-Quote/
+SnapQuote/
 ├── backend/                 Cloudflare Worker (JSON API + AI pipeline)
 │   ├── src/index.js
 │   ├── wrangler.toml        AI binding, KV binding, CORS origin
