@@ -6,7 +6,7 @@ Home-service companies send their customers to SnapQuote instead of sending an i
 
 - **Front end:** Lovable (React + Tailwind), built in Lovable ([Lovable Dashboard](https://lovable.dev/dashboard))
 - **Back end:** Cloudflare Worker + Workers AI + KV, in `backend/`
-- **More information** [Snap Quote](https://docs.google.com/document/d/1zMvyyWeTOoS4sw7ibXwr9S0aDKrNioOqW6QYL5X97g0/edit?usp=sharing)
+- **More information:** [Snap Quote](https://docs.google.com/document/d/1zMvyyWeTOoS4sw7ibXwr9S0aDKrNioOqW6QYL5X97g0/edit?usp=sharing)
 
 ```
 SnapQuote/
