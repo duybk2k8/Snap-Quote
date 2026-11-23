@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your request — SnapQuote</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/">Snap<span>Quote</span></a>
+      <nav class="nav">
+        <a href="/quote" data-page="quote">Get a quote</a>
+        <a href="/companies" data-page="companies">For companies</a>
+        <a href="/dashboard" data-page="dashboard">Dashboard</a>
+        <a href="/insights" data-page="insights">Insights</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="max-width:760px">
+    <h1>Your request <span id="jobId" class="muted"></span></h1>
+    <p class="muted">This page refreshes by itself every 10 seconds.</p>
+
+    <section class="card mt-1" id="statusCard">
+      <p class="muted">Loading…</p>
+    </section>
+
+    <section class="card mt-1 hidden" id="planCard">
+      <h2>Your plan</h2>
+      <div class="job">
+        <div class="thumbs" id="thumbs"></div>
+        <div id="planText"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="container">Demo mode: no card is ever charged.</div></footer>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/request.js"></script>
+</body>
+</html>

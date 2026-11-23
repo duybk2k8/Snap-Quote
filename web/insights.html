@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Market insights — SnapQuote</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/">Snap<span>Quote</span></a>
+      <nav class="nav">
+        <a href="/quote" data-page="quote">Get a quote</a>
+        <a href="/companies" data-page="companies">For companies</a>
+        <a href="/dashboard" data-page="dashboard">Dashboard</a>
+        <a href="/insights" data-page="insights">Insights</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Market insights</h1>
+    <p class="muted">Built only from finalized, paid jobs, stored anonymously: no names, emails or photos.</p>
+
+    <div class="stats five">
+      <div class="stat"><span>Requests</span><b id="tRequests">0</b></div>
+      <div class="stat"><span>Contracts</span><b id="tContracts">0</b></div>
+      <div class="stat"><span>Paid jobs</span><b id="tPaid">0</b></div>
+      <div class="stat"><span>Conversion</span><b id="tConversion">0%</b></div>
+      <div class="stat"><span>Learning records</span><b id="tRecords">0</b></div>
+    </div>
+
+    <div class="grid-2">
+      <section class="card">
+        <h2>Estimate accuracy by area</h2>
+        <p class="muted" id="calibCaption"></p>
+        <table id="calibTable"></table>
+      </section>
+      <section class="card">
+        <h2>What homeowners buy</h2>
+        <p class="muted">Which visualized replacements turn into paid jobs.</p>
+        <div class="bars" id="bars"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer"><div class="container">Refreshes every 15 seconds.</div></footer>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/insights.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/c/:slug", "destination": "/quote" },
+    { "source": "/dashboard/:slug", "destination": "/dashboard" },
+    { "source": "/request/:id", "destination": "/request" }
+  ]
+}

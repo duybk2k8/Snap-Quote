@@ -74,30 +74,30 @@ export default {
       }
 
       // Free quoting (AI pipeline)
-      if (method === 'POST' && pathname === '/api/analyze') return analyze(request, env);
-      if (method === 'POST' && pathname === '/api/visualize') return visualize(request, env);
-      if (method === 'POST' && pathname === '/api/estimate') return estimate(request, env);
+      if (method === 'POST' && pathname === '/api/analyze') return await analyze(request, env);
+      if (method === 'POST' && pathname === '/api/visualize') return await visualize(request, env);
+      if (method === 'POST' && pathname === '/api/estimate') return await estimate(request, env);
 
       // Companies and billing
-      if (method === 'POST' && pathname === '/api/companies') return createCompany(request, env);
-      if (method === 'GET' && pathname === '/api/companies') return listCompaniesRoute(env);
+      if (method === 'POST' && pathname === '/api/companies') return await createCompany(request, env);
+      if (method === 'GET' && pathname === '/api/companies') return await listCompaniesRoute(env);
       const c = pathname.match(/^\/api\/companies\/([a-z0-9-]+)$/i);
-      if (c && method === 'GET') return getCompanyRoute(env, c[1]);
-      if (method === 'GET' && pathname === '/api/quote-fee') return quoteFeeRoute(url, env);
+      if (c && method === 'GET') return await getCompanyRoute(env, c[1]);
+      if (method === 'GET' && pathname === '/api/quote-fee') return await quoteFeeRoute(url, env);
 
       // Requests, contracts, payment
-      if (method === 'POST' && pathname === '/api/jobs') return createJob(request, env);
-      if (method === 'GET' && pathname === '/api/jobs') return listJobsRoute(url, env);
+      if (method === 'POST' && pathname === '/api/jobs') return await createJob(request, env);
+      if (method === 'GET' && pathname === '/api/jobs') return await listJobsRoute(url, env);
       const m = pathname.match(/^\/api\/jobs\/([a-z0-9-]+)(\/contract|\/pay|\/accept)?$/i);
       if (m && method === 'GET' && !m[2]) {
         const job = await getJob(env, m[1]);
         return job ? json({ job }) : json({ error: 'Job not found' }, 404);
       }
-      if (m && method === 'POST' && m[2] === '/contract') return sendContract(request, env, m[1]);
-      if (m && method === 'POST' && (m[2] === '/pay' || m[2] === '/accept')) return payContract(env, m[1]);
+      if (m && method === 'POST' && m[2] === '/contract') return await sendContract(request, env, m[1]);
+      if (m && method === 'POST' && (m[2] === '/pay' || m[2] === '/accept')) return await payContract(env, m[1]);
 
       // Learning data
-      if (method === 'GET' && pathname === '/api/insights') return insights(env);
+      if (method === 'GET' && pathname === '/api/insights') return await insights(env);
 
       return json({ error: 'Not found' }, 404);
     } catch (err) {

@@ -4,6 +4,8 @@ export const VISION_MODEL = '@cf/meta/llama-3.2-11b-vision-instruct';
 export const TEXT_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 export const INPAINT_MODEL = '@cf/runwayml/stable-diffusion-v1-5-inpainting';
 export const IMG2IMG_MODEL = '@cf/runwayml/stable-diffusion-v1-5-img2img';
+// Last-resort text-to-image when both photo-editing models fail (inpainting was deprecated Nov 20, 2026).
+export const TEXT2IMG_MODEL = '@cf/black-forest-labs/flux-1-schnell';
 
 // Demo price book (CAD/USD-agnostic, per unit). Replace with real regional data.
 export const PRICE_BOOK = {

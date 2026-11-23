@@ -59,6 +59,10 @@ All values live in `backend/src/config.js`.
 
 Only jobs that were requested **and** finalized (paid) become learning data, stored anonymously (no names, emails or photos). Future quotes use it to correct local prices after 3 paid jobs in an area and to surface what nearby homeowners actually bought. Details in `docs/API.md`.
 
+## Web front end (`web/`)
+
+Plain HTML + CSS with a little JavaScript, no build step, deployed on Vercel (root directory `web`). See `web/README.md` for the file layout, how to run it locally and the deploy steps. The older Lovable/React version is kept in `frontend/` for reference.
+
 ## 1. Deploy the back end
 
 ```bash

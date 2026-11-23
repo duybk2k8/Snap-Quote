@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Company dashboard — SnapQuote</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/">Snap<span>Quote</span></a>
+      <nav class="nav">
+        <a href="/quote" data-page="quote">Get a quote</a>
+        <a href="/companies" data-page="companies">For companies</a>
+        <a href="/dashboard" data-page="dashboard">Dashboard</a>
+        <a href="/insights" data-page="insights">Insights</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="row spread">
+      <div>
+        <h1 id="dashTitle">All requests</h1>
+        <p class="muted" id="dashLink">Every request is photographed, visualized and priced. Verify it and finalize the contract, no site visit needed.</p>
+      </div>
+      <div class="row">
+        <a class="btn btn-ghost" href="/insights">Market insights</a>
+        <button class="btn btn-ghost" id="refreshBtn" type="button">Refresh</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span>Requests</span><b id="sRequests">0</b></div>
+      <div class="stat"><span>Contracts sent</span><b id="sContracts">0</b></div>
+      <div class="stat"><span>Paid jobs</span><b id="sPaid">0</b></div>
+      <div class="stat"><span>Repair revenue</span><b id="sRevenue">$0</b></div>
+      <div class="stat"><span>Your payout</span><b id="sPayout">$0</b></div>
+      <div class="stat"><span>Estimate vs contract</span><b id="sDelta">–</b></div>
+    </div>
+
+    <div id="jobs" class="stack"></div>
+  </main>
+
+  <footer class="site-footer"><div class="container">Refreshes every 10 seconds.</div></footer>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
